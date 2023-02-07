@@ -38,6 +38,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
 
         private void onScroll(object sender, ScrollEventArgs e)
         {
+            foreach (var control in dataGridView.Controls.OfType<ButtonCell3Up>())
+            {
+                control.Visible = false; ;
+            }
         }
 
         BindingList<Record> Records { get; } = new BindingList<Record>();
