@@ -23,27 +23,25 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Width = old.Width,
             });
         }
-        // Keep track of controls added by this instance
-        // so that they can be removed by this instance.
-        private readonly List<Control> _controls = new List<Control>();
-        internal void AddUC(Control control)
-        {
-            _controls.Add(control);
-            DataGridView.Controls.Add(control);
-        }
         internal void RemoveUC(Control control)
         {
             _controls.Remove(control);
-            DataGridView.Controls.Remove(control);
+            if (_dataGridView != null)
+            {
+                _dataGridView.Controls.Remove(control);
+            }
         }
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
             if ((DataGridView == null) && (_dataGridView != null))
             {
-                foreach (var control in _controls)
+                _dataGridView.Invalidated -= (sender, e) => refresh();
+                _dataGridView.Scroll -= (sender, e) => refresh();
+                _dataGridView.SizeChanged -= (sender, e) => refresh();
+                foreach (var control in _controls.ToArray())
                 {
-                    _dataGridView.Controls.Remove(control);
+                    RemoveUC(control);
                 }
             }
             else
@@ -53,6 +51,14 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 DataGridView.SizeChanged += (sender, e) =>refresh();
             }
             _dataGridView = DataGridView;
+        }
+        // Keep track of controls added by this instance
+        // so that they can be removed by this instance.
+        private readonly List<Control> _controls = new List<Control>();
+        internal void AddUC(Control control)
+        {
+            _controls.Add(control);
+            DataGridView.Controls.Add(control);
         }
 
         int _wdtCount = 0;
@@ -85,15 +91,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
     public class DataGridViewUserControlCell : DataGridViewCell
     {
         private Control _control = null;
+        private DataGridViewUserControlColumn _column;
         public override Type FormattedValueType => typeof(string);
-        private DataGridViewUserControlColumn Column
-        {
-            get
-            {
-                var col = DataGridView.Columns[ColumnIndex];
-                return (DataGridViewUserControlColumn)col;
-            }
-        }
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
         {
@@ -103,7 +102,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 // WILL occur on Swap() and when a row is deleted.
                 if (TryGetControl(out var control))
                 {
-                    Column.RemoveUC(control);
+                    _column.RemoveUC(control);
                 }
             }
             _dataGridView = DataGridView;
@@ -139,14 +138,15 @@ namespace datagridviewcell_with_three_horizontal_buttons
                     if ((RowIndex != -1) && (RowIndex < DataGridView.Rows.Count))
                     {
                         var row = DataGridView.Rows[RowIndex];
-                        var column = DataGridView.Columns[ColumnIndex];
+                        _column = (DataGridViewUserControlColumn)DataGridView.Columns[ColumnIndex];
                         var record = row.DataBoundItem;
                         var type = record.GetType();
-                        var pi = type.GetProperty(column.Name);
+                        var pi = type.GetProperty(_column.Name);
                         control = (Control)pi.GetValue(record);
                         if (control.Parent == null)
                         {
-                            Column.AddUC(control);
+                            DataGridView.Controls.Add(control);
+                            _column.AddUC(control);
                         }
                     }
                 }
