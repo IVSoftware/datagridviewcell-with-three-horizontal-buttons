@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -60,7 +62,44 @@ namespace datagridviewcell_with_three_horizontal_buttons
         public DataGridViewUserControlCell() 
         { }
         public override Type FormattedValueType => typeof(string);
-        public T Control { get; private set; } = new T() { Visible = false };
+        public T Control
+        {
+            get
+            {
+                if(DataGridView == null)
+                {
+                    return default(T);
+                }
+                var row = DataGridView.Rows[RowIndex];
+                if (row.IsNewRow)
+                {
+                    return default(T);
+                }
+                else
+                {
+                    var record = row.DataBoundItem;
+                    if (record == null)
+                    {
+                        return default(T);
+                    }
+                    var name = DataGridView.Columns[ColumnIndex].Name;
+                    var pi = record.GetType().GetProperty(name);
+                    if (pi == null)
+                    {
+                        return default(T);
+                    }
+                    else
+                    {
+                        var control = (T)pi.GetValue(record);
+                        DataGridView.Controls.Add(control);
+                        var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                        var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
+                        Debug.Assert(count.Equals(distinct), $"Not expecting duplicates");
+                        return control;
+                    }
+                }
+            }
+        }
 
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
@@ -68,18 +107,18 @@ namespace datagridviewcell_with_three_horizontal_buttons
             base.OnDataGridViewChanged();
             if((DataGridView == null) && (_dataGridView != null))
             {
-                // WILL occur on Swap()
-                _dataGridView.Controls.Remove(Control);
-                var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                { }
-                Control.Dispose();
+                //// WILL occur on Swap()
+                //_dataGridView.Controls.Remove(Control);
+                //var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                //{ }
+                //Control.Dispose();
             }
             else
             {
-                DataGridView.Controls.Add(Control);
-                var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
-                { }
+                //DataGridView.Controls.Add(Control);
+                //var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                //var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
+                //{ }
             }
             _dataGridView = DataGridView;
         }

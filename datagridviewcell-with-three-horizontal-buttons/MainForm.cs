@@ -109,7 +109,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
-        public string Modes => string.Empty; 
+        public ButtonCell3Up Modes { get; } = new ButtonCell3Up { Visible = false }; 
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
