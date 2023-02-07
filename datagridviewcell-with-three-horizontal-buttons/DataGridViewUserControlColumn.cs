@@ -163,6 +163,9 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 if (control.Parent == null)
                 {
                     DataGridView.Controls.Add(control);
+                    var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                    var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
+                    { }
                 }
                 control.Visible = true;
             }

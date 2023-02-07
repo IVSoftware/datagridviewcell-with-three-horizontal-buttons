@@ -52,8 +52,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Records.Add(new Record { Description = "Voltage Range" });  
 #endif
             { }
-            //for (int i = 1; i <= Records.Count; i++)
-            //    Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
+            for (int i = 1; i <= Records.Count; i++)
+                Records[i - 1].Modes.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
         public static void AssertCount(DataGridView dataGridView, int expected)
         {
