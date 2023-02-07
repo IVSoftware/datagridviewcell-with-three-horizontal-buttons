@@ -19,7 +19,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             dataGridView.CellPainting += onCellPainting;
             Records.ListChanged += onRecordsChanged;
             dataGridView.MouseDoubleClick += onMouseDoubleClick;
-            dataGridView.Scroll += onScroll;
 
             #region F O R M A T    C O L U M N S
             Records.Add(new Record()); // <- Auto-configure columns
@@ -36,17 +35,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Add(new Record { Description = "Power Range" });
             }
         }
-
-        private void onScroll(object sender, ScrollEventArgs e)
-        {
-            foreach (var control in dataGridView.Controls.OfType<ButtonCell3Up>())
-            {
-                control.Visible = false; ;
-            }
-        }
-
         BindingList<Record> Records { get; } = new BindingList<Record>();
-
         private void onRecordsChanged(object sender, ListChangedEventArgs e)
         {
             switch (e.ListChangedType)
@@ -86,41 +75,39 @@ namespace datagridviewcell_with_three_horizontal_buttons
             {
                 if (
                         (e.RowIndex != -1) && 
-                        (e.RowIndex < dataGridView.Rows.Count) &&
-                        e.ColumnIndex.Equals(dataGridView.Columns[nameof(Record.Control)].Index)
+                        (e.RowIndex < dataGridView.Rows.Count)
                     )
-                {                    
+                {
                     if (!dataGridView.Rows[e.RowIndex].IsNewRow)
                     {
-                        preQual();
-
-
-
-                        var record = Records[e.RowIndex];
-                        if(record.Control.Parent == null)
+                        hideIfLocationChanged();
+                        if (e.ColumnIndex.Equals(dataGridView.Columns[nameof(Record.Control)].Index))
                         {
-                            dataGridView.Controls.Add(record.Control);
+                            var record = Records[e.RowIndex];
+                            if (record.Control.Parent == null)
+                            {
+                                dataGridView.Controls.Add(record.Control);
+                            }
+                            record.Control.Location = e.CellBounds.Location;
+                            record.Control.Size = e.CellBounds.Size;
+                            record.Control.Visible = true;
                         }
-                        record.Control.Location = e.CellBounds.Location;
-                        record.Control.Size = e.CellBounds.Size;
-                        record.Control.Visible= true;
                     }
                 }
             }
-        }
-
-        private void preQual()
-        {
-            var cIndex = dataGridView.Columns[nameof(Record.Control)].Index;
-            for (int i = 0; i < dataGridView.Rows.Count; i++)
+            void hideIfLocationChanged()
             {
-                if (!dataGridView.Rows[i].IsNewRow)
+                var cIndex = dataGridView.Columns[nameof(Record.Control)].Index;
+                for (int i = 0; i < dataGridView.Rows.Count; i++)
                 {
-                    var control = Records[i].Control;
-                    var sbLoc = dataGridView.GetCellDisplayRectangle(cIndex, i, true).Location;
-                    if (control.Location != sbLoc)
+                    if (!dataGridView.Rows[i].IsNewRow)
                     {
-                        control.Visible = false;
+                        var control = Records[i].Control;
+                        var sbLoc = dataGridView.GetCellDisplayRectangle(cIndex, i, true).Location;
+                        if (control.Location != sbLoc)
+                        {
+                            control.Visible = false;
+                        }
                     }
                 }
             }
