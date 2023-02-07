@@ -58,7 +58,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                     break;
             }
         }
-
         private void onMouseDoubleClick(object sender, MouseEventArgs e)
         {
             var b4 = dataGridView.Controls.OfType<ButtonCell3Up>().Count();
@@ -68,7 +67,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 var ftr = dataGridView.Controls.OfType<ButtonCell3Up>().Count();
             });
         }
-
         private void onCellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
             if (sender is DataGridView dataGridView)
@@ -112,7 +110,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
-
         protected override CreateParams CreateParams
         {
             get
