@@ -36,6 +36,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Add(new Record { Description = "Current Range" });
                 Records.Add(new Record { Description = "Power Range" });
             }
+            for (int i = 1; i <= Records.Count; i++)
+                Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onRecordsChanged(object sender, ListChangedEventArgs e)

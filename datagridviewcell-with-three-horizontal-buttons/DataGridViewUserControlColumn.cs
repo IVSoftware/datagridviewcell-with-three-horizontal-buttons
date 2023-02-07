@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace datagridviewcell_with_three_horizontal_buttons
 {
-    public class DataGridViewUserControlColumn<T> : DataGridViewColumn where T: Control
+    public class DataGridViewUserControlColumn<T> : DataGridViewColumn where T: Control, new()
     {
         public DataGridViewUserControlColumn()
         {
@@ -24,8 +24,9 @@ namespace datagridviewcell_with_three_horizontal_buttons
             });
         }
     }
-    public class DataGridViewUserControlCell<T> : DataGridViewCell
+    public class DataGridViewUserControlCell<T> : DataGridViewCell where T: Control, new()
     {
         public override Type FormattedValueType => typeof(string);
+        public T Control { get; } = new T();
     }
 }
