@@ -1,10 +1,11 @@
-I agree that sometimes there's a solid use case for something like "three buttons" or (in my use case) where each row has its own rolling `Chart` of real time data. Something that works for me is having a custom `DataGridViewUserControlColumn` class as coded below.  
+I agree that sometimes there's a solid use case to display a `UserControl` whether it's "three buttons" or each row having its own rolling `Chart` of real time data or whatever! One approach that long-term has worked for me, tried and true, is having a custom `DataGridViewUserControlColumn` class similar to the one coded below.  
 
 The theory of operation is to allow the bound data class to have properties that derive from `UserControl`. The auto-generated Column in the DGV corresponding to can be swapped out. Then,  when a `DataGridViewUserControlCell` gets "painted" instead of drawing the cell what happens instead is that the control is moved (if necessary) so that its bounds coincide with the cell bounds being drawn. Since the user control is in the DataGridView.Controls collection, the UC stays on top in the z-order and paints the same as any child of any container would.
 
-The UserControl is added to the `DataGridView.Controls` collection the first time it's drawn and removed when the cell's `DataGridView` property is set to null, such as when a row is deleted. When the `AllowUserToAddRows` options is enabled, a new row will _not_ show a control until the item editing is complete.
-
 [![screenshot][1]][1]
+
+The item's UserControl is added to the `DataGridView.Controls` collection the first time it's drawn and removed when the cell's `DataGridView` property is set to null (e.g. when user deletes a row). When the `AllowUserToAddRows` options is enabled, the "new row" list item doesn't show a control until the item editing is complete.
+
 
 ***
 **Typical Record class**
@@ -258,4 +259,4 @@ The UserControl is added to the `DataGridView.Controls` collection the first tim
     }
 
 
-  [1]: https://i.stack.imgur.com/HqaW5.png
+  [1]: https://i.stack.imgur.com/5ObTH.png
