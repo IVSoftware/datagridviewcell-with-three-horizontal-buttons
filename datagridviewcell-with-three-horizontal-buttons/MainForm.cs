@@ -19,6 +19,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             dataGridView.CellPainting += onCellPainting;
             Records.ListChanged += onRecordsChanged;
             dataGridView.MouseDoubleClick += onMouseDoubleClick;
+            dataGridView.Scroll += onScroll;
 
             #region F O R M A T    C O L U M N S
             Records.Add(new Record()); // <- Auto-configure columns
@@ -34,6 +35,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Add(new Record { Description = "Power Range" });
             }
         }
+
+        private void onScroll(object sender, ScrollEventArgs e)
+        {
+        }
+
         BindingList<Record> Records { get; } = new BindingList<Record>();
 
         private void onRecordsChanged(object sender, ListChangedEventArgs e)
