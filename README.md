@@ -16,18 +16,12 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
         {
             Modes.TextChanged += (sender, e) =>
                 OnPropertyChanged(nameof(Description));
+            Actions.Click += (sender, e) =>
+                { _ = execTask(); };
         }
-
-        private void onModesTextChanged(object sender, EventArgs e) =>
-            OnPropertyChanged(nameof(Description));
-
-        string _description = string.Empty;
         public string Description
         {
-            get
-            {
-                return $"{Modes.Text} : {_description}";
-            }
+            get => $"{Modes.Text} : {_description}";
             set
             {
                 if (!Equals(_description, value))
@@ -37,8 +31,24 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 }
             }
         }
-        // This can be any type of Control.
-        public ButtonCell3Up Modes { get; } = new ButtonCell3Up { Visible = false }; 
+        string _description = string.Empty;
+
+        #region B O U N D    C O N T R O L S    o f    A N Y    T Y P E   
+        public ButtonCell3Up Modes { get; } = new ButtonCell3Up();
+        public ProgressBar Actions { get; } = new ProgressBar { Value = 1 };  
+        #endregion B O U N D    C O N T R O L S    o f    A N Y    T Y P E   
+
+        private async Task execTask()
+        {
+            Actions.Value = 0;
+            while(Actions.Value < Actions.Maximum)
+            {
+                await Task.Delay(250);
+                Actions.Value++;
+            }
+        }
+        private void onModesTextChanged(object sender, EventArgs e) =>
+            OnPropertyChanged(nameof(Description));
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -46,8 +56,6 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
-
-
 ***
 **Configure DGV**
 
@@ -66,6 +74,9 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
             dataGridView.Columns[nameof(Record.Description)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             dataGridView.Columns[nameof(Record.Modes)].Width = 200;
             DataGridViewUserControlColumn.Swap(dataGridView.Columns[nameof(Record.Modes)]);
+            dataGridView.Columns[nameof(Record.Actions)].Width = 200;
+            dataGridView.Columns[nameof(Record.Actions)].DefaultCellStyle.Padding = new Padding(5);
+            DataGridViewUserControlColumn.Swap(dataGridView.Columns[nameof(Record.Actions)]);
             Records.Clear();
             #endregion F O R M A T    C O L U M N S
 
@@ -116,21 +127,40 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
             DataGridViewAdvancedBorderStyle advancedBorderStyle,
             DataGridViewPaintParts paintParts)
         {
-            if (DataGridView.Rows[rowIndex].IsNewRow)
+            using (var brush = new SolidBrush(getBackColor(@default: Color.Azure)))
             {
-                graphics.FillRectangle(Brushes.Azure, cellBounds);
+                graphics.FillRectangle(brush, cellBounds);
+            }
+            if (DataGridView.Rows[rowIndex].IsNewRow)
+            {   /* G T K */
             }
             else
             {
                 if (TryGetControl(out var control))
                 {
-                    control.Location = cellBounds.Location;
-                    control.Size = cellBounds.Size;
-                    control.Visible = true;
+                    SetLocationAndSize(cellBounds, control);
                 }
             }
+            Color getBackColor(Color @default)
+            {
+                if((_column != null) && (_column.DefaultCellStyle != null))
+                {
+                    Style = _column.DefaultCellStyle;
+                }
+                return Style.BackColor.A == 0 ? @default : Style.BackColor;
+            }
         }
-
+        public void SetLocationAndSize(Rectangle cellBounds, Control control, bool visible = true)
+        {
+            control.Location = new Point(
+                cellBounds.Location.X +
+                Style.Padding.Left,
+                cellBounds.Location.Y + Style.Padding.Top);
+            control.Size = new Size(
+                cellBounds.Size.Width - (Style.Padding.Left + Style.Padding.Right),
+                cellBounds.Height - (Style.Padding.Top + Style.Padding.Bottom));
+            control.Visible = visible;
+        }
         public bool TryGetControl(out Control control)
         {
             control = null;
@@ -153,16 +183,12 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                         }
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     Debug.Assert(false, ex.Message);
                 }
                 _control = control;
             }
-            else
-            {
-                control = _control;
-            }
+            else control = _control;
             return _control != null;
         }
     }
@@ -170,7 +196,6 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
  ***
  **Custom Column**
 
- 
     public class DataGridViewUserControlColumn : DataGridViewColumn
     {
         public DataGridViewUserControlColumn() => CellTemplate = new DataGridViewUserControlCell();
@@ -184,6 +209,7 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 Name = old.Name,
                 AutoSizeMode = old.AutoSizeMode,
                 Width = old.Width,
+                DefaultCellStyle = old.DefaultCellStyle,
             });
         }
         protected override void OnDataGridViewChanged()
@@ -198,13 +224,16 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 {
                     RemoveUC(control);
                 }
-
             }
             else
             {
                 DataGridView.Invalidated += (sender, e) =>refresh();
                 DataGridView.Scroll += (sender, e) =>refresh();
                 DataGridView.SizeChanged += (sender, e) =>refresh();
+                DataGridView.Parent.SizeChanged += (sender, e) =>
+                {
+                   // refresh();
+                };
             }
             _dataGridView = DataGridView;
         }
@@ -224,7 +253,6 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 _dataGridView.Controls.Remove(control);
             }
         }
-
         int _wdtCount = 0;
         private void refresh()
         {
@@ -235,21 +263,22 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 .GetAwaiter()
                 .OnCompleted(() => 
                 {
-                    foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
+                    if (DataGridView != null)
                     {
-                        if (row.Cells[Index] is DataGridViewUserControlCell cell)
+                        foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
                         {
-                            if (row.IsNewRow)
-                            {   /* G T K */
-                            }
-                            else
+                            if (row.Cells[Index] is DataGridViewUserControlCell cell)
                             {
-                                var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
-                                if (cell.TryGetControl(out var control))
+                                if (row.IsNewRow)
+                                {   /* G T K */
+                                }
+                                else
                                 {
-                                    control.Location = cellBounds.Location;
-                                    control.Size = cellBounds.Size;
-                                    control.Visible = !row.IsNewRow;
+                                    var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
+                                    if (cell.TryGetControl(out var control))
+                                    {
+                                        cell.SetLocationAndSize(cellBounds, control, visible: !row.IsNewRow);
+                                    }
                                 }
                             }
                         }
@@ -260,4 +289,4 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
     }
 
 
-  [1]: https://i.stack.imgur.com/BwCxW.png
+  [1]: https://i.stack.imgur.com/nXsE1.png

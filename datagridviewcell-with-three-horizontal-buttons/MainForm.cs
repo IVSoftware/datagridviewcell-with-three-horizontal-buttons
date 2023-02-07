@@ -34,12 +34,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 "Expecting the Clear method to reset the custom controls");
             #endregion F O R M A T    C O L U M N S
 
-            dataGridView.ControlAdded += (sender, e) =>
-            {
-                var count =
-                    dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                { }
-            };
             // Add 15 items
             for (int i = 0; i < 5; i++)
             {
@@ -60,6 +54,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Clear();
             }
         }
+
+        // Make app startup drawing more even.
         protected override CreateParams CreateParams
         {
             get
