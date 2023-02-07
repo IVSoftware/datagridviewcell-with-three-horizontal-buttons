@@ -16,7 +16,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             base.OnLoad(e);
             dataGridView.DataSource = Records;
             dataGridView.RowTemplate.Height = 50;
-            dataGridView.CellPainting += onCellPainting;
             Records.ListChanged += onRecordsChanged;
             dataGridView.MouseDoubleClick += onMouseDoubleClick;
 
@@ -29,6 +28,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Records.Clear();
             #endregion F O R M A T    C O L U M N S
 
+#if false
             // Add a few items
             for (int i = 0; i < 5; i++)
             {
@@ -36,6 +36,9 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Add(new Record { Description = "Current Range" });
                 Records.Add(new Record { Description = "Power Range" });
             }
+#else
+            Records.Add(new Record { Description = "Voltage Range" });  
+#endif
             for (int i = 1; i <= Records.Count; i++)
                 Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
@@ -70,49 +73,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             {
                 var ftr = dataGridView.Controls.OfType<ButtonCell3Up>().Count();
             });
-        }
-        private void onCellPainting(object sender, DataGridViewCellPaintingEventArgs e)
-        {
-            if (sender is DataGridView dataGridView)
-            {
-                if (
-                        (e.RowIndex != -1) && 
-                        (e.RowIndex < dataGridView.Rows.Count)
-                    )
-                {
-                    if (!dataGridView.Rows[e.RowIndex].IsNewRow)
-                    {
-                        hideIfLocationChanged();
-                        if (e.ColumnIndex.Equals(dataGridView.Columns[nameof(Record.Control)].Index))
-                        {
-                            var record = Records[e.RowIndex];
-                            if (record.Control.Parent == null)
-                            {
-                                dataGridView.Controls.Add(record.Control);
-                            }
-                            record.Control.Location = e.CellBounds.Location;
-                            record.Control.Size = e.CellBounds.Size;
-                            record.Control.Visible = true;
-                        }
-                    }
-                }
-            }
-            void hideIfLocationChanged()
-            {
-                var cIndex = dataGridView.Columns[nameof(Record.Control)].Index;
-                for (int i = 0; i < dataGridView.Rows.Count; i++)
-                {
-                    if (!dataGridView.Rows[i].IsNewRow)
-                    {
-                        var control = Records[i].Control;
-                        var sbLoc = dataGridView.GetCellDisplayRectangle(cIndex, i, true).Location;
-                        if (control.Location != sbLoc)
-                        {
-                            control.Visible = false;
-                        }
-                    }
-                }
-            }
         }
         protected override CreateParams CreateParams
         {
