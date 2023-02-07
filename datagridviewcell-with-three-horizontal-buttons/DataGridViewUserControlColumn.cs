@@ -160,17 +160,16 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 var control = (T)pi.GetValue(record);
                 control.Location = cellBounds.Location;
                 control.Size = cellBounds.Size;
+                if (control.Parent == null)
+                {
+                    DataGridView.Controls.Add(control);
+                }
+                control.Visible = true;
             }
             catch (Exception ex)
             {
                 Debug.Assert(false, ex.Message);
             }
         }
-        //public override object Clone()
-        //{
-        //    var clone = (DataGridViewUserControlCell<T>)base.Clone();
-        //    clone.Control = Control;
-        //    return clone;
-        //}
     }
 }
