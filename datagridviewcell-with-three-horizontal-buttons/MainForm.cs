@@ -78,10 +78,25 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Modes.TextChanged += (sender, e) =>
                 OnPropertyChanged(nameof(Description));
             Actions.Click += (sender, e) =>
-            {
-                _ = execTask();
-            };
+                { _ = execTask(); };
         }
+        public string Description
+        {
+            get => $"{Modes.Text} : {_description}";
+            set
+            {
+                if (!Equals(_description, value))
+                {
+                    _description = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        string _description = string.Empty;
+        #region B O U N D    C O N T R O L S    o f    A N Y    T Y P E   
+        public ButtonCell3Up Modes { get; } = new ButtonCell3Up();
+        public ProgressBar Actions { get; } = new ProgressBar { Value = 1 };  
+        #endregion B O U N D    C O N T R O L S    o f    A N Y    T Y P E   
 
         private async Task execTask()
         {
@@ -92,29 +107,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Actions.Value++;
             }
         }
-
         private void onModesTextChanged(object sender, EventArgs e) =>
             OnPropertyChanged(nameof(Description));
-
-        string _description = string.Empty;
-        public string Description
-        {
-            get
-            {
-                return $"{Modes.Text} : {_description}";
-            }
-            set
-            {
-                if (!Equals(_description, value))
-                {
-                    _description = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        // This can be any type of Control.
-        public ButtonCell3Up Modes { get; } = new ButtonCell3Up(); 
-        public ProgressBar Actions { get; } = new ProgressBar { Value = 1 }; 
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

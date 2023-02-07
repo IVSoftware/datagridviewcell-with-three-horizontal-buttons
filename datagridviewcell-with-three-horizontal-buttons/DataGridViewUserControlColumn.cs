@@ -42,6 +42,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 DataGridView.Invalidated += (sender, e) =>refresh();
                 DataGridView.Scroll += (sender, e) =>refresh();
                 DataGridView.SizeChanged += (sender, e) =>refresh();
+                DataGridView.Parent.SizeChanged += (sender, e) =>
+                {
+                   // refresh();
+                };
             }
             _dataGridView = DataGridView;
         }
@@ -143,20 +147,29 @@ namespace datagridviewcell_with_three_horizontal_buttons
             DataGridViewAdvancedBorderStyle advancedBorderStyle,
             DataGridViewPaintParts paintParts)
         {
-            if (DataGridView.Rows[rowIndex].IsNewRow)
+            using (var brush = new SolidBrush(getBackColor(@default: Color.Azure)))
             {
-                graphics.FillRectangle(Brushes.Azure, cellBounds);
+                graphics.FillRectangle(brush, cellBounds);
+            }
+            if (DataGridView.Rows[rowIndex].IsNewRow)
+            {   /* G T K */
             }
             else
             {
-                Style = _column.DefaultCellStyle;
                 if (TryGetControl(out var control))
                 {
                     SetLocationAndSize(cellBounds, control);
                 }
             }
+            Color getBackColor(Color @default)
+            {
+                if((_column != null) && (_column.DefaultCellStyle != null))
+                {
+                    Style = _column.DefaultCellStyle;
+                }
+                return Style.BackColor.A == 0 ? @default : Style.BackColor;
+            }
         }
-
         public void SetLocationAndSize(Rectangle cellBounds, Control control, bool visible = true)
         {
             control.Location = new Point(
@@ -168,7 +181,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 cellBounds.Height - (Style.Padding.Top + Style.Padding.Bottom));
             control.Visible = visible;
         }
-
         public bool TryGetControl(out Control control)
         {
             control = null;
@@ -191,16 +203,12 @@ namespace datagridviewcell_with_three_horizontal_buttons
                         }
                     }
                 }
-                catch (Exception ex)
-                {
+                catch (Exception ex) {
                     Debug.Assert(false, ex.Message);
                 }
                 _control = control;
             }
-            else
-            {
-                control = _control;
-            }
+            else control = _control;
             return _control != null;
         }
     }
