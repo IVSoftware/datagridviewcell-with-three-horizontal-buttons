@@ -26,10 +26,15 @@ namespace datagridviewcell_with_three_horizontal_buttons
         // Keep track of controls added by this instance
         // so that they can be removed by this instance.
         private readonly List<Control> _controls = new List<Control>();
-        internal void Add(Control control)
+        internal void AddUC(Control control)
         {
             _controls.Add(control);
             DataGridView.Controls.Add(control);
+        }
+        internal void RemoveUC(Control control)
+        {
+            _controls.Remove(control);
+            DataGridView.Controls.Remove(control);
         }
         protected override void OnDataGridViewChanged()
         {
@@ -79,20 +84,26 @@ namespace datagridviewcell_with_three_horizontal_buttons
 
     public class DataGridViewUserControlCell : DataGridViewCell
     {
-        public DataGridViewUserControlCell() 
-        { }
+        private Control _control = null;
         public override Type FormattedValueType => typeof(string);
-
+        private DataGridViewUserControlColumn Column
+        {
+            get
+            {
+                var col = DataGridView.Columns[ColumnIndex];
+                return (DataGridViewUserControlColumn)col;
+            }
+        }
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
             if((DataGridView == null) && (_dataGridView != null))
             {
-                // WILL occur on Swap()
+                // WILL occur on Swap() and when a row is deleted.
                 if (TryGetControl(out var control))
                 {
-                    _dataGridView.Controls.Remove(control);
+                    Column.RemoveUC(control);
                 }
             }
             _dataGridView = DataGridView;
@@ -109,41 +120,47 @@ namespace datagridviewcell_with_three_horizontal_buttons
             DataGridViewCellStyle cellStyle,
             DataGridViewAdvancedBorderStyle advancedBorderStyle,
             DataGridViewPaintParts paintParts)
-        {
+        {            
             if (TryGetControl(out var control))
             {
                 control.Location = cellBounds.Location;
                 control.Size = cellBounds.Size;
-                if (control.Parent == null)
-                {
-                    var col = DataGridView.Columns[ColumnIndex];
-                    ((DataGridViewUserControlColumn)col).Add(control);
-                }
                 control.Visible = true;
             }
         }
 
         public bool TryGetControl(out Control control)
         {
-            try
-            {
-                if ((RowIndex != -1) && (RowIndex < DataGridView.Rows.Count))
-                {
-                    var row = DataGridView.Rows[RowIndex];
-                    var column = DataGridView.Columns[ColumnIndex];
-                    var record = row.DataBoundItem;
-                    var type = record.GetType();
-                    var pi = type.GetProperty(column.Name);
-                    control = (Control)pi.GetValue(record);
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.Assert(false, ex.Message);
-            }
             control = null;
-            return false;
+            if (_control == null)
+            {
+                try
+                {
+                    if ((RowIndex != -1) && (RowIndex < DataGridView.Rows.Count))
+                    {
+                        var row = DataGridView.Rows[RowIndex];
+                        var column = DataGridView.Columns[ColumnIndex];
+                        var record = row.DataBoundItem;
+                        var type = record.GetType();
+                        var pi = type.GetProperty(column.Name);
+                        control = (Control)pi.GetValue(record);
+                        if (control.Parent == null)
+                        {
+                            Column.AddUC(control);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.Assert(false, ex.Message);
+                }
+                _control = control;
+            }
+            else
+            {
+                control = _control;
+            }
+            return _control != null;
         }
     }
 }
