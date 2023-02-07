@@ -39,14 +39,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 { }
             };
             // Add a few items
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 5; i++)
             {
                 Records.Add(new Record { Description = "Voltage Range" });
-                // AssertCount(dataGridView, 1);
                 Records.Add(new Record { Description = "Current Range" });
-                // AssertCount(dataGridView, 2);
                 Records.Add(new Record { Description = "Power Range" });
-                // AssertCount(dataGridView, 3);
             }
 #else
             Records.Add(new Record { Description = "Voltage Range" });  
@@ -54,13 +51,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             { }
             for (int i = 1; i <= Records.Count; i++)
                 Records[i - 1].Modes.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
-        }
-        public static void AssertCount(DataGridView dataGridView, int expected)
-        {
-            var actual =
-                dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-            Debug.Assert(expected.Equals(actual),
-                $"Expected {expected}  Actual {actual}");
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onMouseDoubleClick(object sender, MouseEventArgs e)

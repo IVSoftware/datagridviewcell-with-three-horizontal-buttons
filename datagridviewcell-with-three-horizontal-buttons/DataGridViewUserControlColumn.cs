@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace datagridviewcell_with_three_horizontal_buttons
@@ -42,30 +44,28 @@ namespace datagridviewcell_with_three_horizontal_buttons
             _dataGridView = DataGridView;
         }
 
+        int _wdtCount = 0;
         private void refresh()
         {
-            foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
-            {
-                if(row.Cells[Index] is DataGridViewUserControlCell<T> cell)
+            var capture = ++_wdtCount;
+            Task
+                .Delay(TimeSpan.FromMilliseconds(10))
+                .GetAwaiter()
+                .OnCompleted(() => 
                 {
-                    var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
-                    try
+                    foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
                     {
-#if false
-                        var record = row.DataBoundItem;
-                        var type = record.GetType();
-                        var pi = type.GetProperty(Name);
-                        var control = (T)pi.GetValue(record);
-                        control.Location = cellBounds.Location;
-                        control.Size = cellBounds.Size;
-#endif
+                        if (row.Cells[Index] is DataGridViewUserControlCell<T> cell)
+                        {
+                            var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
+                            if (cell.TryGetControl(out var control))
+                            {
+                                control.Location = cellBounds.Location;
+                                control.Size = cellBounds.Size;
+                            }
+                        }
                     }
-                    catch (Exception ex)
-                    {
-                        // Debug.Assert(false, ex.Message);
-                    }
-                }
-            }
+                });
         }
 
         private DataGridView _dataGridView = null;
@@ -76,88 +76,38 @@ namespace datagridviewcell_with_three_horizontal_buttons
         { }
         public override Type FormattedValueType => typeof(string);
 
-#if false
-        public T Control
-        {
-            get
-            {
-                if(DataGridView == null)
-                {
-                    return default(T);
-                }
-                var row = DataGridView.Rows[RowIndex];
-                if (row.IsNewRow)
-                {
-                    return default(T);
-                }
-                else
-                {
-                    var record = row.DataBoundItem;
-                    if (record == null)
-                    {
-                        return default(T);
-                    }
-                    var name = DataGridView.Columns[ColumnIndex].Name;
-                    var pi = record.GetType().GetProperty(name);
-                    if (pi == null)
-                    {
-                        return default(T);
-                    }
-                    else
-                    {
-                        var control = (T)pi.GetValue(record);
-                        DataGridView.Controls.Add(control);
-                        var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                        var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
-                        Debug.Assert(count.Equals(distinct), $"Not expecting duplicates");
-                        return control;
-                    }
-                }
-            }
-        }
-#endif
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
             if((DataGridView == null) && (_dataGridView != null))
             {
-                //// WILL occur on Swap()
-                //_dataGridView.Controls.Remove(Control);
-                //var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                //{ }
-                //Control.Dispose();
-            }
-            else
-            {
-                //DataGridView.Controls.Add(Control);
-                //var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                //var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
-                //{ }
+                // WILL occur on Swap()
+                if (TryGetControl(out var control))
+                {
+                    _dataGridView.Controls.Remove(control);
+                    control.Dispose();
+                    var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                    { }
+                }
             }
             _dataGridView = DataGridView;
         }
         protected override void Paint(
             Graphics graphics,
-            Rectangle clipBounds, 
-            Rectangle cellBounds, 
-            int rowIndex, 
-            DataGridViewElementStates cellState, 
-            object value, 
-            object formattedValue, 
+            Rectangle clipBounds,
+            Rectangle cellBounds,
+            int rowIndex,
+            DataGridViewElementStates cellState,
+            object value,
+            object formattedValue,
             string errorText,
             DataGridViewCellStyle cellStyle,
-            DataGridViewAdvancedBorderStyle advancedBorderStyle, 
+            DataGridViewAdvancedBorderStyle advancedBorderStyle,
             DataGridViewPaintParts paintParts)
         {
-            try
+            if (TryGetControl(out var control))
             {
-                var row = DataGridView.Rows[rowIndex];
-                var column = DataGridView.Columns[ColumnIndex];
-                var record =row.DataBoundItem;
-                var type = record.GetType();
-                var pi = type.GetProperty(column.Name);
-                var control = (T)pi.GetValue(record);
                 control.Location = cellBounds.Location;
                 control.Size = cellBounds.Size;
                 if (control.Parent == null)
@@ -169,10 +119,29 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
                 control.Visible = true;
             }
+        }
+
+        public bool TryGetControl(out Control control)
+        {
+            try
+            {
+                if ((RowIndex != -1) && (RowIndex < DataGridView.Rows.Count))
+                {
+                    var row = DataGridView.Rows[RowIndex];
+                    var column = DataGridView.Columns[ColumnIndex];
+                    var record = row.DataBoundItem;
+                    var type = record.GetType();
+                    var pi = type.GetProperty(column.Name);
+                    control = (T)pi.GetValue(record);
+                    return true;
+                }
+            }
             catch (Exception ex)
             {
                 Debug.Assert(false, ex.Message);
             }
+            control = null;
+            return false;
         }
     }
 }
