@@ -1,6 +1,6 @@
 I agree that sometimes there's a solid use case to display a `UserControl` whether it's "three buttons" or each row having its own rolling `Chart` of real time data or whatever! One approach that long-term has worked for me, tried and true, is having a  `DataGridViewUserControlColumn` class similar to the one coded below that can host a control in the cell bounds instead of just drawing one.  
 
-The theory of operation is to allow the bound data class to have properties that derive from `UserControl`. The auto-generated Column in the DGV corresponding to can be swapped out. Then,  when a `DataGridViewUserControlCell` gets "painted" instead of drawing the cell what happens instead is that the control is moved (if necessary) so that its bounds coincide with the cell bounds being drawn. Since the user control is in the DataGridView.Controls collection, the UC stays on top in the z-order and paints the same as any child of any container would.
+The theory of operation is to allow the bound data class to have properties that derive from `Control`. The corresponding auto-generated column(s) in the DGV can be swapped out. Then, when a `DataGridViewUserControlCell` gets "painted" instead of drawing the cell what happens instead is that the control is moved (if necessary) so that its bounds coincide with the cell bounds being drawn. Since the user control is in the DataGridView.Controls collection, the UC stays on top in the z-order and paints the same as any child of any container would.
 
 [![screenshot][1]][1]
 
@@ -230,10 +230,6 @@ The item's UserControl is added to the `DataGridView.Controls` collection the fi
                 DataGridView.Invalidated += (sender, e) =>refresh();
                 DataGridView.Scroll += (sender, e) =>refresh();
                 DataGridView.SizeChanged += (sender, e) =>refresh();
-                DataGridView.Parent.SizeChanged += (sender, e) =>
-                {
-                   // refresh();
-                };
             }
             _dataGridView = DataGridView;
         }

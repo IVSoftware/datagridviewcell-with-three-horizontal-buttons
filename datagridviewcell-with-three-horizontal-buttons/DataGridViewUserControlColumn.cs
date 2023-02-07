@@ -42,10 +42,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 DataGridView.Invalidated += (sender, e) =>refresh();
                 DataGridView.Scroll += (sender, e) =>refresh();
                 DataGridView.SizeChanged += (sender, e) =>refresh();
-                DataGridView.Parent.SizeChanged += (sender, e) =>
-                {
-                   // refresh();
-                };
             }
             _dataGridView = DataGridView;
         }
