@@ -16,7 +16,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             base.OnLoad(e);
             dataGridView.DataSource = Records;
             dataGridView.RowTemplate.Height = 50;
-            dataGridView.MouseDoubleClick += onMouseDoubleClick;
+            dataGridView.MouseDoubleClick += onMouseDoubleClick;  
 
             #region F O R M A T    C O L U M N S
             Records.Add(new Record()); // <- Auto-configure columns
@@ -31,24 +31,19 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 "Expecting the Clear method to reset the custom controls");
             #endregion F O R M A T    C O L U M N S
 
-#if true
             dataGridView.ControlAdded += (sender, e) =>
             {
                 var count =
                     dataGridView.Controls.OfType<ButtonCell3Up>().Count();
                 { }
             };
-            // Add a few items
+            // Add 15 items
             for (int i = 0; i < 5; i++)
             {
                 Records.Add(new Record { Description = "Voltage Range" });
                 Records.Add(new Record { Description = "Current Range" });
                 Records.Add(new Record { Description = "Power Range" });
             }
-#else
-            Records.Add(new Record { Description = "Voltage Range" });  
-#endif
-            { }
             for (int i = 1; i <= Records.Count; i++)
                 Records[i - 1].Modes.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
@@ -100,7 +95,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
-        // ANY type of Control.
+        // This can be any type of Control.
         public ButtonCell3Up Modes { get; } = new ButtonCell3Up { Visible = false }; 
 
         public event PropertyChangedEventHandler PropertyChanged;

@@ -23,14 +23,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Width = old.Width,
             });
         }
-        internal void RemoveUC(Control control)
-        {
-            _controls.Remove(control);
-            if (_dataGridView != null)
-            {
-                _dataGridView.Controls.Remove(control);
-            }
-        }
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
@@ -43,6 +35,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 {
                     RemoveUC(control);
                 }
+
             }
             else
             {
@@ -59,6 +52,28 @@ namespace datagridviewcell_with_three_horizontal_buttons
         {
             _controls.Add(control);
             DataGridView.Controls.Add(control);
+#if DEBUG
+            var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
+            if (Form.ActiveForm != null)
+            {
+                Form.ActiveForm.Text = $"[{count}] {nameof(ButtonCell3Up)} Controls";
+            }
+#endif
+        }
+        internal void RemoveUC(Control control)
+        {
+            _controls.Remove(control);
+            if (_dataGridView != null)
+            {
+                _dataGridView.Controls.Remove(control);
+#if DEBUG
+                var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                if (Form.ActiveForm != null)
+                {
+                    Form.ActiveForm.Text = $"[{count}] {nameof(ButtonCell3Up)} Controls";
+                }
+#endif
+            }
         }
 
         int _wdtCount = 0;
