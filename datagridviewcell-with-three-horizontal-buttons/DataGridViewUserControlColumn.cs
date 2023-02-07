@@ -35,7 +35,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 {
                     RemoveUC(control);
                 }
-
             }
             else
             {
