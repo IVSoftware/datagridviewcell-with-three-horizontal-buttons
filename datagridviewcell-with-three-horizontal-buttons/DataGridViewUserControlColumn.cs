@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -32,8 +28,13 @@ namespace datagridviewcell_with_three_horizontal_buttons
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
-            if (DataGridView == null)
+            if ((DataGridView == null) && (_dataGridView != null))
             {
+                var controls = _dataGridView.Controls.OfType<T>().ToArray();
+                foreach (var control in controls)
+                {
+                    _dataGridView.Controls.Remove(control);
+                }
             }
             else
             {
@@ -67,9 +68,9 @@ namespace datagridviewcell_with_three_horizontal_buttons
                     }
                 });
         }
-
         private DataGridView _dataGridView = null;
     }
+
     public class DataGridViewUserControlCell<T> : DataGridViewCell where T: Control, new()
     {
         public DataGridViewUserControlCell() 
@@ -86,9 +87,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 if (TryGetControl(out var control))
                 {
                     _dataGridView.Controls.Remove(control);
-                    control.Dispose();
-                    var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                    { }
                 }
             }
             _dataGridView = DataGridView;

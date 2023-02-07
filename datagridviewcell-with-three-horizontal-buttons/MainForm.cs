@@ -75,20 +75,21 @@ namespace datagridviewcell_with_three_horizontal_buttons
     }
     class Record : INotifyPropertyChanged
     {
-        string _currentButton;
+        public Record()
+        {
+            Modes.TextChanged += (sender, e) =>
+                OnPropertyChanged(nameof(Description));
+        }
+
+        private void onModesTextChanged(object sender, EventArgs e) =>
+            OnPropertyChanged(nameof(Description));
+
         string _description = string.Empty;
         public string Description
         {
             get
             {
-                if(string.IsNullOrEmpty(_description))
-                {
-                    return _description;
-                }
-                else
-                {
-                    return $"{_description} - {_currentButton}";
-                }
+                return $"{Modes.Text} : {_description}";
             }
             set
             {
@@ -99,6 +100,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
+        // ANY type of Control.
         public ButtonCell3Up Modes { get; } = new ButtonCell3Up { Visible = false }; 
 
         public event PropertyChangedEventHandler PropertyChanged;
