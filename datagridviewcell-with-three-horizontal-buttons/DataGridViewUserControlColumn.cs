@@ -21,6 +21,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Name = old.Name,
                 AutoSizeMode = old.AutoSizeMode,
                 Width = old.Width,
+                DefaultCellStyle = old.DefaultCellStyle,
             });
         }
         protected override void OnDataGridViewChanged()
@@ -85,21 +86,22 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 .GetAwaiter()
                 .OnCompleted(() => 
                 {
-                    foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
+                    if (DataGridView != null)
                     {
-                        if (row.Cells[Index] is DataGridViewUserControlCell cell)
+                        foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
                         {
-                            if (row.IsNewRow)
-                            {   /* G T K */
-                            }
-                            else
+                            if (row.Cells[Index] is DataGridViewUserControlCell cell)
                             {
-                                var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
-                                if (cell.TryGetControl(out var control))
+                                if (row.IsNewRow)
+                                {   /* G T K */
+                                }
+                                else
                                 {
-                                    control.Location = cellBounds.Location;
-                                    control.Size = cellBounds.Size;
-                                    control.Visible = !row.IsNewRow;
+                                    var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
+                                    if (cell.TryGetControl(out var control))
+                                    {
+                                        cell.SetLocationAndSize(cellBounds, control, visible: !row.IsNewRow);
+                                    }
                                 }
                             }
                         }
@@ -147,13 +149,24 @@ namespace datagridviewcell_with_three_horizontal_buttons
             }
             else
             {
+                Style = _column.DefaultCellStyle;
                 if (TryGetControl(out var control))
                 {
-                    control.Location = cellBounds.Location;
-                    control.Size = cellBounds.Size;
-                    control.Visible = true;
+                    SetLocationAndSize(cellBounds, control);
                 }
             }
+        }
+
+        public void SetLocationAndSize(Rectangle cellBounds, Control control, bool visible = true)
+        {
+            control.Location = new Point(
+                cellBounds.Location.X +
+                Style.Padding.Left,
+                cellBounds.Location.Y + Style.Padding.Top);
+            control.Size = new Size(
+                cellBounds.Size.Width - (Style.Padding.Left + Style.Padding.Right),
+                cellBounds.Height - (Style.Padding.Top + Style.Padding.Bottom));
+            control.Visible = visible;
         }
 
         public bool TryGetControl(out Control control)

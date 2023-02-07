@@ -41,7 +41,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowHeadersWidth = 62;
             this.dataGridView.RowTemplate.Height = 33;
-            this.dataGridView.Size = new System.Drawing.Size(832, 431);
+            this.dataGridView.Size = new System.Drawing.Size(976, 440);
             this.dataGridView.TabIndex = 0;
             // 
             // MainForm
@@ -49,7 +49,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.Teal;
-            this.ClientSize = new System.Drawing.Size(834, 435);
+            this.ClientSize = new System.Drawing.Size(978, 444);
             this.Controls.Add(this.dataGridView);
             this.Name = "MainForm";
             this.Padding = new System.Windows.Forms.Padding(1, 2, 1, 2);
