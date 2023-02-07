@@ -11,11 +11,16 @@ namespace datagridviewcell_with_three_horizontal_buttons
 {
     public partial class ButtonCell3Up : UserControl
     {
+        static int _id = -1;
         public ButtonCell3Up()
         {
+            _id++;
             InitializeComponent();
             foreach (RadioButton radio in new Control[] { button1, button2, button3 })
+            {
                 radio.CheckedChanged += onRadioCheckedChanged;
+                radio.Text = $"{_id}{radio.Text}";
+            }
             Text = button1.Text;
         }
 
