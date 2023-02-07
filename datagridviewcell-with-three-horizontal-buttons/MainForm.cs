@@ -26,10 +26,13 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Records.Clear();
             #endregion F O R M A T    C O L U M N S
 
-            // Add a few items
-            Records.Add(new Record { Description = "Voltage Range"});
-            Records.Add(new Record { Description = "Current Range"});
-            Records.Add(new Record { Description = "Power Range"});
+            for (int i = 0; i < 5; i++)
+            {
+                // Add a few items
+                Records.Add(new Record { Description = "Voltage Range" });
+                Records.Add(new Record { Description = "Current Range" });
+                Records.Add(new Record { Description = "Power Range" });
+            }
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
 
