@@ -16,7 +16,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             base.OnLoad(e);
             dataGridView.DataSource = Records;
             dataGridView.RowTemplate.Height = 50;
-            Records.ListChanged += onRecordsChanged;
             dataGridView.MouseDoubleClick += onMouseDoubleClick;
 
             #region F O R M A T    C O L U M N S
@@ -43,28 +42,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             //    Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
-        private void onRecordsChanged(object sender, ListChangedEventArgs e)
-        {
-            switch (e.ListChangedType)
-            {
-                case ListChangedType.Reset:
-                case ListChangedType.ItemDeleted:
-                    var controlsB4 =
-                        dataGridView.Controls.OfType<ButtonCell3Up>().ToArray();
-                    if (controlsB4.Length != 0)
-                    {
-                        foreach (var buttonCell3Up in controlsB4)
-                        {
-                            if (!Records.Any(_ => _.Control.Equals(buttonCell3Up)))
-                            {
-                                buttonCell3Up.Dispose();
-                                dataGridView.Controls.Remove(buttonCell3Up);
-                            }
-                        }
-                    }
-                    break;
-            }
-        }
         private void onMouseDoubleClick(object sender, MouseEventArgs e)
         {
             var b4 = dataGridView.Controls.OfType<ButtonCell3Up>().Count();

@@ -57,8 +57,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
     }
     public class DataGridViewUserControlCell<T> : DataGridViewCell where T: Control, new()
     {
+        public DataGridViewUserControlCell() 
+        { }
         public override Type FormattedValueType => typeof(string);
-        public T Control { get; } = new T();
+        public T Control { get; } = new T() { Visible = false };
 
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
