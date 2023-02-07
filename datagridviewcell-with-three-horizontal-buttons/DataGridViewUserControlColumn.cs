@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -7,31 +8,35 @@ using System.Windows.Forms;
 
 namespace datagridviewcell_with_three_horizontal_buttons
 {
-    public class DataGridViewUserControlColumn<T> : DataGridViewColumn where T: Control, new()
+    public class DataGridViewUserControlColumn : DataGridViewColumn
     {
-        public DataGridViewUserControlColumn()
-        {
-            CellTemplate = new DataGridViewUserControlCell<T>();
-        }
+        public DataGridViewUserControlColumn() => CellTemplate = new DataGridViewUserControlCell();
         public static void Swap(DataGridViewColumn old)
         {
             var dataGridView = old.DataGridView;
             var indexB4 = old.Index;
             dataGridView.Columns.RemoveAt(indexB4);
-            dataGridView.Columns.Insert(indexB4, new DataGridViewUserControlColumn<T>
+            dataGridView.Columns.Insert(indexB4, new DataGridViewUserControlColumn
             {
                 Name = old.Name,
                 AutoSizeMode = old.AutoSizeMode,
                 Width = old.Width,
             });
         }
+        // Keep track of controls added by this instance
+        // so that they can be removed by this instance.
+        private readonly List<Control> _controls = new List<Control>();
+        internal void Add(Control control)
+        {
+            _controls.Add(control);
+            DataGridView.Controls.Add(control);
+        }
         protected override void OnDataGridViewChanged()
         {
             base.OnDataGridViewChanged();
             if ((DataGridView == null) && (_dataGridView != null))
             {
-                var controls = _dataGridView.Controls.OfType<T>().ToArray();
-                foreach (var control in controls)
+                foreach (var control in _controls)
                 {
                     _dataGridView.Controls.Remove(control);
                 }
@@ -49,6 +54,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
         private void refresh()
         {
             var capture = ++_wdtCount;
+            // Allow changes to settle.
             Task
                 .Delay(TimeSpan.FromMilliseconds(10))
                 .GetAwaiter()
@@ -56,7 +62,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 {
                     foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
                     {
-                        if (row.Cells[Index] is DataGridViewUserControlCell<T> cell)
+                        if (row.Cells[Index] is DataGridViewUserControlCell cell)
                         {
                             var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
                             if (cell.TryGetControl(out var control))
@@ -71,7 +77,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
         private DataGridView _dataGridView = null;
     }
 
-    public class DataGridViewUserControlCell<T> : DataGridViewCell where T: Control, new()
+    public class DataGridViewUserControlCell : DataGridViewCell
     {
         public DataGridViewUserControlCell() 
         { }
@@ -110,10 +116,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 control.Size = cellBounds.Size;
                 if (control.Parent == null)
                 {
-                    DataGridView.Controls.Add(control);
-                    var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
-                    var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
-                    { }
+                    var col = DataGridView.Columns[ColumnIndex];
+                    ((DataGridViewUserControlColumn)col).Add(control);
                 }
                 control.Visible = true;
             }
@@ -130,7 +134,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                     var record = row.DataBoundItem;
                     var type = record.GetType();
                     var pi = type.GetProperty(column.Name);
-                    control = (T)pi.GetValue(record);
+                    control = (Control)pi.GetValue(record);
                     return true;
                 }
             }

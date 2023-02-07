@@ -1,6 +1,12 @@
 I agree that sometimes there's a solid use case for something like "three buttons" or (in my use case) where each row has its own rolling `Chart` of real time data. 
 
-So here's a way to show any `UserControl` in a `DataGridViewCell` that I've used a lot and has worked for me.  Basically, the class that's bound to the data grid view has a member that is the user control. The _first_ time the cell gets painted, the user control associated with the row is added to the Controls collection of the DGV and _every_ time the cell is painted the `Location` and `Size` of the control are verified to be at the cell bounds. As far as disposing the controls in a dynamic scenario, when the `ListChanged` event of the binding list fires there's a cleanup that removes any user controls that don't have a corresponding row item.
+A technique that I've used a lot that works for me is an abstraction of a `DataGridViewUserControlColumn<T>` as coded below.  Basically, if the class that's bound to the data grid view has a property derived from UserControl then the auto-generated Column in the DGV can be swapped out.  
+
+
+
+
+
+The _first_ time the cell gets painted, the user control associated with the row is added to the Controls collection of the DGV and _every_ time the cell is painted the `Location` and `Size` of the control are verified to be at the cell bounds. As far as disposing the controls in a dynamic scenario, when the `ListChanged` event of the binding list fires there's a cleanup that removes any user controls that don't have a corresponding row item.
 
 [![screenshot][1]][1]
 

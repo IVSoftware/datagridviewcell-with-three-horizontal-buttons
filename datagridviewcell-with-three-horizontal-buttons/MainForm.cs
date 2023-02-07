@@ -22,7 +22,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Records.Add(new Record()); // <- Auto-configure columns
             dataGridView.Columns[nameof(Record.Description)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
             dataGridView.Columns[nameof(Record.Modes)].Width = 200;
-            DataGridViewUserControlColumn<ButtonCell3Up>
+            DataGridViewUserControlColumn
                 .Swap(dataGridView.Columns[nameof(Record.Modes)]);
             Records.Clear();
 
