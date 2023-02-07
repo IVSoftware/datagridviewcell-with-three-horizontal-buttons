@@ -11,18 +11,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
 {
     public partial class ButtonCell3Up : UserControl
     {
-        public string[] Labels
-        {
-            set
-            {
-                var buttons = new Control[] { button1, button2, button3 };
-                for (int i = 0; i < 3; i++)
-                {
-                    buttons[i].Text = value[i];
-                }
-            }
-        }
-
         public ButtonCell3Up()
         {
             InitializeComponent();
@@ -34,6 +22,17 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 };
             }
             Text = button1.Text;
+        }
+        public string[] Labels
+        {
+            set
+            {
+                var buttons = new Control[] { button1, button2, button3 };
+                for (int i = 0; i < 3; i++)
+                {
+                    buttons[i].Text = value[i];
+                }
+            }
         }
 
         private void onRadioCheckedChanged(object sender, EventArgs e)

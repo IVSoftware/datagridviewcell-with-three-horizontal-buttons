@@ -60,7 +60,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
         public DataGridViewUserControlCell() 
         { }
         public override Type FormattedValueType => typeof(string);
-        public T Control { get; } = new T() { Visible = false };
+        public T Control { get; private set; } = new T() { Visible = false };
 
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
@@ -99,5 +99,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
             Control.Location = cellBounds.Location;
             Control.Size = cellBounds.Size;
         }
+        //public override object Clone()
+        //{
+        //    var clone = (DataGridViewUserControlCell<T>)base.Clone();
+        //    clone.Control = Control;
+        //    return clone;
+        //}
     }
 }
