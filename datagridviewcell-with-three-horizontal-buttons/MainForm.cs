@@ -50,12 +50,12 @@ namespace datagridviewcell_with_three_horizontal_buttons
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onMouseDoubleClick(object sender, MouseEventArgs e)
         {
-            var b4 = dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-            Records.Clear();
-            BeginInvoke((MethodInvoker)delegate
+            var client = dataGridView.PointToClient(MousePosition);
+            var hittest = dataGridView.HitTest(client.X, client.Y);
+            if (hittest.Type.Equals(DataGridViewHitTestType.None))
             {
-                var ftr = dataGridView.Controls.OfType<ButtonCell3Up>().Count();
-            });
+                Records.Clear();
+            }
         }
         protected override CreateParams CreateParams
         {

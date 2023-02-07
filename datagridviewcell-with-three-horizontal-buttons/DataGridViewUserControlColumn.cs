@@ -90,11 +90,18 @@ namespace datagridviewcell_with_three_horizontal_buttons
                     {
                         if (row.Cells[Index] is DataGridViewUserControlCell cell)
                         {
-                            var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
-                            if (cell.TryGetControl(out var control))
+                            if (row.IsNewRow)
+                            {   /* G T K */
+                            }
+                            else
                             {
-                                control.Location = cellBounds.Location;
-                                control.Size = cellBounds.Size;
+                                var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
+                                if (cell.TryGetControl(out var control))
+                                {
+                                    control.Location = cellBounds.Location;
+                                    control.Size = cellBounds.Size;
+                                    control.Visible = !row.IsNewRow;
+                                }
                             }
                         }
                     }
@@ -134,12 +141,19 @@ namespace datagridviewcell_with_three_horizontal_buttons
             DataGridViewCellStyle cellStyle,
             DataGridViewAdvancedBorderStyle advancedBorderStyle,
             DataGridViewPaintParts paintParts)
-        {            
-            if (TryGetControl(out var control))
+        {
+            if (DataGridView.Rows[rowIndex].IsNewRow)
             {
-                control.Location = cellBounds.Location;
-                control.Size = cellBounds.Size;
-                control.Visible = true;
+                graphics.FillRectangle(Brushes.Azure, cellBounds);
+            }
+            else
+            {
+                if (TryGetControl(out var control))
+                {
+                    control.Location = cellBounds.Location;
+                    control.Size = cellBounds.Size;
+                    control.Visible = true;
+                }
             }
         }
 

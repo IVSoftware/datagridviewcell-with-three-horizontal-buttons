@@ -35,7 +35,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
             // 
             // dataGridView
             // 
-            this.dataGridView.AllowUserToAddRows = false;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView.Location = new System.Drawing.Point(1, 2);
