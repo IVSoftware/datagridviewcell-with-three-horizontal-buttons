@@ -92,6 +92,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 {                    
                     if (!dataGridView.Rows[e.RowIndex].IsNewRow)
                     {
+                        preQual();
+
+
+
                         var record = Records[e.RowIndex];
                         if(record.Control.Parent == null)
                         {
@@ -104,6 +108,24 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
+
+        private void preQual()
+        {
+            var cIndex = dataGridView.Columns[nameof(Record.Control)].Index;
+            for (int i = 0; i < dataGridView.Rows.Count; i++)
+            {
+                if (!dataGridView.Rows[i].IsNewRow)
+                {
+                    var control = Records[i].Control;
+                    var sbLoc = dataGridView.GetCellDisplayRectangle(cIndex, i, true).Location;
+                    if (control.Location != sbLoc)
+                    {
+                        control.Visible = false;
+                    }
+                }
+            }
+        }
+
         protected override CreateParams CreateParams
         {
             get
