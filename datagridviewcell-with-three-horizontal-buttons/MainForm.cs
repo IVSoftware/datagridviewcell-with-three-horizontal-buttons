@@ -22,15 +22,15 @@ namespace datagridviewcell_with_three_horizontal_buttons
             #region F O R M A T    C O L U M N S
             Records.Add(new Record()); // <- Auto-configure columns
             dataGridView.Columns[nameof(Record.Description)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridView.Columns[nameof(Record.Control)].Width = 200;
+            dataGridView.Columns[nameof(Record.Modes)].Width = 200;
             DataGridViewUserControlColumn<ButtonCell3Up>
-                .Swap(dataGridView.Columns[nameof(Record.Control)]);
+                .Swap(dataGridView.Columns[nameof(Record.Modes)]);
             Records.Clear();
             #endregion F O R M A T    C O L U M N S
 
-#if false
+#if true
             // Add a few items
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 1; i++)
             {
                 Records.Add(new Record { Description = "Voltage Range" });
                 Records.Add(new Record { Description = "Current Range" });
@@ -39,8 +39,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
 #else
             Records.Add(new Record { Description = "Voltage Range" });  
 #endif
-            for (int i = 1; i <= Records.Count; i++)
-                Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
+            //for (int i = 1; i <= Records.Count; i++)
+            //    Records[i - 1].Control.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onRecordsChanged(object sender, ListChangedEventArgs e)
@@ -87,16 +87,6 @@ namespace datagridviewcell_with_three_horizontal_buttons
     }
     class Record : INotifyPropertyChanged
     {
-        public Record()
-        {
-            _currentButton = Control.Text;
-            Control.ButtonChanged += onButtonChanged;
-        }
-        private void onButtonChanged(object sender, EventArgs e)
-        {
-            _currentButton = Control.Text;
-            OnPropertyChanged(nameof(Description));
-        }
         string _currentButton;
         string _description = string.Empty;
         public string Description
@@ -121,8 +111,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
-        [DisplayName("Modes")]
-        public ButtonCell3Up Control { get; } = new ButtonCell3Up(); 
+        public string Modes => string.Empty; 
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

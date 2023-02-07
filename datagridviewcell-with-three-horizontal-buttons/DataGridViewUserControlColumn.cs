@@ -33,7 +33,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             }
             else
             {
-                // DataGridView.Invalidated += (sender, e) =>refresh();
+                DataGridView.Invalidated += (sender, e) =>refresh();
                 DataGridView.Scroll += (sender, e) =>refresh();
                 DataGridView.SizeChanged += (sender, e) =>refresh();
             }
@@ -44,12 +44,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
         {
             foreach (DataGridViewRow row in DataGridView.Rows)
             {
-                var ctx = DataGridView.Controls.OfType<ButtonCell3Up>().ToArray();
-                if(ctx.Length == 2)
-                { }
-                for (int i = 0; i < ctx.Length; i++)
+                if(row.Cells[Index] is DataGridViewUserControlCell<T> cell)
                 {
-                    // ctx[i].Visible = false;
+                    var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
+                    cell.Control.Location = cellBounds.Location;
+                    cell.Control.Size = cellBounds.Size;
                 }
             }
         }
@@ -67,12 +66,18 @@ namespace datagridviewcell_with_three_horizontal_buttons
             base.OnDataGridViewChanged();
             if((DataGridView == null) && (_dataGridView != null))
             {
-                Control.Visible = false;
+                // WILL occur on Swap()
                 _dataGridView.Controls.Remove(Control);
+                var count = _dataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                { }
+                Control.Dispose();
             }
             else
             {
                 DataGridView.Controls.Add(Control);
+                var count = DataGridView.Controls.OfType<ButtonCell3Up>().Count();
+                var distinct = DataGridView.Controls.OfType<ButtonCell3Up>().Distinct().Count();
+                { }
             }
             _dataGridView = DataGridView;
         }

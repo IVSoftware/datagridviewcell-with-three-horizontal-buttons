@@ -11,20 +11,14 @@ namespace datagridviewcell_with_three_horizontal_buttons
 {
     public partial class ButtonCell3Up : UserControl
     {
-        string[] _labels = new string[] { "A", "B", "C" };
         public string[] Labels
         {
-            get => _labels;
             set
             {
-                if (!Equals(_labels, value))
+                var buttons = new Control[] { button1, button2, button3 };
+                for (int i = 0; i < 3; i++)
                 {
-                    _labels = value;
-                    var buttons = new Control[] { button1, button2, button3 };
-                    for (int i = 0; i < 3; i++)
-                    {
-                        buttons[i].Text = Labels[i];
-                    }
+                    buttons[i].Text = value[i];
                 }
             }
         }
@@ -33,7 +27,12 @@ namespace datagridviewcell_with_three_horizontal_buttons
         {
             InitializeComponent();
             foreach (RadioButton radio in new Control[] { button1, button2, button3 })
+            {
                 radio.CheckedChanged += onRadioCheckedChanged;
+                radio.TextChanged += (sender, e) =>
+                {
+                };
+            }
             Text = button1.Text;
         }
 
