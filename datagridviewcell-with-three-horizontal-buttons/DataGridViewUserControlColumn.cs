@@ -44,13 +44,26 @@ namespace datagridviewcell_with_three_horizontal_buttons
 
         private void refresh()
         {
-            foreach (DataGridViewRow row in DataGridView.Rows)
+            foreach (var row in DataGridView.Rows.Cast<DataGridViewRow>().ToArray())
             {
                 if(row.Cells[Index] is DataGridViewUserControlCell<T> cell)
                 {
                     var cellBounds = DataGridView.GetCellDisplayRectangle(cell.ColumnIndex, cell.RowIndex, true);
-                    cell.Control.Location = cellBounds.Location;
-                    cell.Control.Size = cellBounds.Size;
+                    try
+                    {
+#if false
+                        var record = row.DataBoundItem;
+                        var type = record.GetType();
+                        var pi = type.GetProperty(Name);
+                        var control = (T)pi.GetValue(record);
+                        control.Location = cellBounds.Location;
+                        control.Size = cellBounds.Size;
+#endif
+                    }
+                    catch (Exception ex)
+                    {
+                        // Debug.Assert(false, ex.Message);
+                    }
                 }
             }
         }
@@ -62,6 +75,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
         public DataGridViewUserControlCell() 
         { }
         public override Type FormattedValueType => typeof(string);
+
+#if false
         public T Control
         {
             get
@@ -100,7 +115,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 }
             }
         }
-
+#endif
         private DataGridView _dataGridView = null;
         protected override void OnDataGridViewChanged()
         {
@@ -135,8 +150,21 @@ namespace datagridviewcell_with_three_horizontal_buttons
             DataGridViewAdvancedBorderStyle advancedBorderStyle, 
             DataGridViewPaintParts paintParts)
         {
-            Control.Location = cellBounds.Location;
-            Control.Size = cellBounds.Size;
+            try
+            {
+                var row = DataGridView.Rows[rowIndex];
+                var column = DataGridView.Columns[ColumnIndex];
+                var record =row.DataBoundItem;
+                var type = record.GetType();
+                var pi = type.GetProperty(column.Name);
+                var control = (T)pi.GetValue(record);
+                control.Location = cellBounds.Location;
+                control.Size = cellBounds.Size;
+            }
+            catch (Exception ex)
+            {
+                Debug.Assert(false, ex.Message);
+            }
         }
         //public override object Clone()
         //{

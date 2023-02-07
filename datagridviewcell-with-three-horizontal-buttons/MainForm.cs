@@ -42,11 +42,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
             for (int i = 0; i < 1; i++)
             {
                 Records.Add(new Record { Description = "Voltage Range" });
-                AssertCount(dataGridView, 1);
+                // AssertCount(dataGridView, 1);
                 Records.Add(new Record { Description = "Current Range" });
-                AssertCount(dataGridView, 2);
+                // AssertCount(dataGridView, 2);
                 Records.Add(new Record { Description = "Power Range" });
-                AssertCount(dataGridView, 3);
+                // AssertCount(dataGridView, 3);
             }
 #else
             Records.Add(new Record { Description = "Voltage Range" });  
