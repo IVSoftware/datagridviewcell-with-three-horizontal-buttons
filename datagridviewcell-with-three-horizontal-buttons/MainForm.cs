@@ -24,7 +24,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             #region F O R M A T    C O L U M N S
             Records.Add(new Record()); // <- Auto-configure columns
             dataGridView.Columns[nameof(Record.Description)].AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dataGridView.Columns[nameof(Record.Control)].Width = 150;
+            dataGridView.Columns[nameof(Record.Control)].Width = 200;
             Records.Clear();
             #endregion F O R M A T    C O L U M N S
 
