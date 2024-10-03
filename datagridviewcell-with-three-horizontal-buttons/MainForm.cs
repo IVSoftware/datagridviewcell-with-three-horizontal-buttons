@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IVSoftware.Portable;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -84,6 +85,19 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 _ = execTask(); 
             };
         }
+        public WatchdogTimer wdtToolTip
+        {
+            get
+            {
+                if (_wdtToolTip is null)
+                {
+                    _wdtToolTip = new WatchdogTimer();
+                }
+                return _wdtToolTip;
+            }
+        }
+        WatchdogTimer? _wdtToolTip = new WatchdogTimer();
+
         public string Description
         {
             get => $"{Modes.Text} : {_description}";
