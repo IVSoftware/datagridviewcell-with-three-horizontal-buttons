@@ -42,7 +42,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 Records.Add(new Record { Description = "Power Range" });
             }
             for (int i = 1; i <= Records.Count; i++)
-                Records[i - 1].Modes.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", }; 
+                Records[i - 1].Modes.Labels = new[] { $"{i}A", $"{i}B", $"{i}C", };
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onMouseDoubleClick(object sender, MouseEventArgs e)
@@ -72,9 +72,17 @@ namespace datagridviewcell_with_three_horizontal_buttons
         public Record()
         {
             Modes.TextChanged += (sender, e) =>
+            {
                 OnPropertyChanged(nameof(Description));
+            };
+            Modes.SelectionChanged += (sender, e) =>
+            {
+                _ = execTask();
+            };
             Actions.Click += (sender, e) =>
-                { _ = execTask(); };
+            { 
+                _ = execTask(); 
+            };
         }
         public string Description
         {
@@ -96,10 +104,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
 
         private async Task execTask()
         {
-            Actions.Value = 0;
+            Actions.Value = Actions.Maximum / 10;
             while(Actions.Value < Actions.Maximum)
             {
-                await Task.Delay(250);
+                await Task.Delay(50);
                 Actions.Value++;
             }
         }
@@ -110,6 +118,14 @@ namespace datagridviewcell_with_three_horizontal_buttons
         protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+    static partial class Extensions
+    {
+        public static ButtonCell3Up WithSelectionChangedHandler(this ButtonCell3Up button, EventHandler handler)
+        {
+            button.SelectionChanged += handler;
+            return button;
         }
     }
 }

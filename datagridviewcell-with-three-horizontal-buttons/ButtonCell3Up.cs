@@ -59,8 +59,10 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 if(radio.Checked)
                 {
                     Text = radio.Text;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
         }
+        public event EventHandler SelectionChanged;
     }
 }
