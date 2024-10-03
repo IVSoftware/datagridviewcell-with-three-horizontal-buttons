@@ -2,7 +2,6 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -84,7 +83,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 _ = execTask(); 
             };
         }
-        public WatchdogTimer wdtToolTip
+        internal WatchdogTimer wdtToolTip
         {
             get
             {
