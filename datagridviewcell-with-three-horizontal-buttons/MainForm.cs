@@ -15,6 +15,11 @@ namespace datagridviewcell_with_three_horizontal_buttons
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+            Point clientTopLeft = PointToScreen(ClientRectangle.Location);
+            NCOffset = new Point(
+                clientTopLeft.X - Location.X,
+                clientTopLeft.Y - Location.Y);
+            Debug.WriteLine($"NC Rect: {NCOffset}");
 
             // Add 15 items
             for (int i = 0; i < 5; i++)
@@ -45,24 +50,28 @@ namespace datagridviewcell_with_three_horizontal_buttons
 
             Record.TooltipRequired += (sender, e) =>
             {
-                if( dataGridView
-                    .Rows
-                    .OfType<DataGridViewRow>()
-                    .FirstOrDefault(_=>Equals(_.DataBoundItem, sender))
-                    is
-                    DataGridViewRow row)
+                if (sender is Record record)
                 {
-                    var descriptionCell = row.Cells["Description"];
-                    var client = dataGridView.GetCellDisplayRectangle(descriptionCell.ColumnIndex, row.Index, true);
-                    var screen = dataGridView.PointToScreen(client.Location);
-                    var location = PointToClient(screen);
+                    if (dataGridView
+                            .Rows
+                            .OfType<DataGridViewRow>()
+                            .FirstOrDefault(_ => Equals(_.DataBoundItem, sender))
+                            is
+                            DataGridViewRow row)
+                    {
+                        var cellRectangle =
+                            dataGridView
+                            .GetCellDisplayRectangle(row.Cells["Description"]
+                            .ColumnIndex,
+                            row.Index, true);
 
-                    descriptionToolTip.Show(
-                        "Changed",
-                        this,
-                        location.X,
-                        location.Y, 
-                        3000); 
+                        descriptionToolTip.Show(
+                            $"New value {record.Modes.Text}",
+                            this,
+                            cellRectangle.X + NCOffset.X + 10,
+                            cellRectangle.Y + NCOffset.Y  - 5,
+                            1000);
+                    }
                 }
             };
         }
@@ -95,6 +104,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             InitialDelay = 10, 
             ReshowDelay = 200
         };
+        private Point NCOffset { get; set; }
     }
     class Record : INotifyPropertyChanged
     {
