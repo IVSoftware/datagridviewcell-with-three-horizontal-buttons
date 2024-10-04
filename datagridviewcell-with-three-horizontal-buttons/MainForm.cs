@@ -1,7 +1,7 @@
-﻿using IVSoftware.Portable;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -42,6 +42,29 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 dataGridView.Controls.OfType<ButtonCell3Up>().Count().Equals(0),
                 "Expecting the Clear method to reset the custom controls");
             #endregion F O R M A T    C O L U M N S
+
+            Record.TooltipRequired += (sender, e) =>
+            {
+                if( dataGridView
+                    .Rows
+                    .OfType<DataGridViewRow>()
+                    .FirstOrDefault(_=>Equals(_.DataBoundItem, sender))
+                    is
+                    DataGridViewRow row)
+                {
+                    var descriptionCell = row.Cells["Description"];
+                    var client = dataGridView.GetCellDisplayRectangle(descriptionCell.ColumnIndex, row.Index, true);
+                    var screen = dataGridView.PointToScreen(client.Location);
+                    var location = PointToClient(screen);
+
+                    descriptionToolTip.Show(
+                        "Changed",
+                        this,
+                        location.X,
+                        location.Y, 
+                        3000); 
+                }
+            };
         }
         BindingList<Record> Records { get; } = new BindingList<Record>();
         private void onMouseDoubleClick(object sender, MouseEventArgs e)
@@ -65,6 +88,13 @@ namespace datagridviewcell_with_three_horizontal_buttons
                 return cp;
             }
         }
+        private ToolTip descriptionToolTip = new ToolTip
+        {
+            IsBalloon = false, 
+            AutoPopDelay = 10, 
+            InitialDelay = 10, 
+            ReshowDelay = 200
+        };
     }
     class Record : INotifyPropertyChanged
     {
@@ -76,25 +106,14 @@ namespace datagridviewcell_with_three_horizontal_buttons
             };
             Modes.SelectionChanged += (sender, e) =>
             {
-                _ = execTask();
+                _ = execTask(); 
+                TooltipRequired?.Invoke(this, EventArgs.Empty);
             };
             Actions.Click += (sender, e) =>
             { 
                 _ = execTask(); 
             };
         }
-        internal WatchdogTimer wdtToolTip
-        {
-            get
-            {
-                if (_wdtToolTip is null)
-                {
-                    _wdtToolTip = new WatchdogTimer();
-                }
-                return _wdtToolTip;
-            }
-        }
-        WatchdogTimer? _wdtToolTip = new WatchdogTimer();
 
         public string Description
         {
@@ -131,6 +150,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+        public static event EventHandler TooltipRequired;
     }
     static partial class Extensions
     {
