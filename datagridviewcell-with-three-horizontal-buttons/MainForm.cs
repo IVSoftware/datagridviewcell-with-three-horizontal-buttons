@@ -68,8 +68,8 @@ namespace datagridviewcell_with_three_horizontal_buttons
                         descriptionToolTip.Show(
                             $"New value {record.Modes.Text}",
                             this,
-                            cellRectangle.X + NCOffset.X + 10,
-                            cellRectangle.Y + NCOffset.Y  - 5,
+                            cellRectangle.X + NCOffset.X + 40,
+                            cellRectangle.Y + NCOffset.Y + 10,
                             1000);
                     }
                 }
