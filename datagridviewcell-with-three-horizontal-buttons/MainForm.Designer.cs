@@ -54,6 +54,7 @@ namespace datagridviewcell_with_three_horizontal_buttons
             this.Name = "MainForm";
             this.Padding = new System.Windows.Forms.Padding(1, 2, 1, 2);
             this.Text = "Main Form";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).EndInit();
             this.ResumeLayout(false);
 
